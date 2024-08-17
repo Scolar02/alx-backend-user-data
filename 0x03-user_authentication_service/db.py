@@ -1,26 +1,28 @@
 #!/usr/bin/env python3
 """
-DB module
+DB module for managing the database interactions.
 """
+
 from sqlalchemy import create_engine
 from sqlalchemy.exc import InvalidRequestError, SQLAlchemyError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
+from typing import Optional
 
 from user import Base, User
 
 
 class DB:
-    """DB class."""
+    """DB class for managing the database interactions."""
 
     def __init__(self) -> None:
         """Initialize a new DB instance."""
         self._engine = create_engine("sqlite:///a.db", echo=False)
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
-        self.__session = None
+        self.__session: Optional[Session] = None
 
     @property
     def _session(self) -> Session:
@@ -34,11 +36,11 @@ class DB:
         """Adds a new user to the database.
 
         Args:
-            email (str): The user's email.
+            email (str): The user's email address.
             hashed_password (str): The user's hashed password.
 
         Returns:
-            User: The created User object.
+            User: The newly created User object.
         """
         new_user = User(email=email, hashed_password=hashed_password)
         try:
@@ -50,10 +52,10 @@ class DB:
             raise
 
     def find_user_by(self, **kwargs) -> User:
-        """Finds a user based on a set of filters.
+        """Finds a user by given attributes.
 
         Args:
-            **kwargs: Arbitrary keyword arguments representing filter conditions.
+            **kwargs: Arbitrary keyword arguments representing user attributes to filter by.
 
         Returns:
             User: The first User object that matches the given filters.
